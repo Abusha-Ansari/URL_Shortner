@@ -1,12 +1,31 @@
 const express = require('express');
-const { Home } = require('./Controllers/routesController');
+const bodyParser = require('body-parser');
+const { Home, addURL, getURL } = require('./Controllers/routesController');
+const ConnectDB = require('./urlDB');
 const app = express();
-require('dotenv').config()
+const cors = require('cors');
+require('dotenv').config();
+
+
+app.use(bodyParser.json());
+
+const corsOptions = {
+    origin: process.env.FRONTEND_ORIGIN, // Allow the frontend origin
+    methods: "GET, PUT, PATCH, DELETE, POST, HEAD",
+    credentials: true, // Allow cookies and credentials
+    allowedHeaders: ["Content-Type", "Authorization"], // Add necessary headers
+  };
+app.use(cors(corsOptions))
 
 app.route("/").get(Home);
+app.route("/add").post(addURL)
+app.route("/get/:URL").get(getURL)
 
 
 const PORT = process.env.BACKEND_URL;
-app.listen(PORT, ()=>{
-    console.log(`Server is live at PORT: ${PORT}`)
+
+ConnectDB().then(()=>{
+    app.listen(PORT, ()=>{
+        console.log(`Server is live at PORT: ${PORT}`)
+    });
 });

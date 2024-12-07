@@ -2,18 +2,49 @@ import React, { useState } from "react";
 
 const UrlShortener = () => {
   const [option, setOption] = useState("random");
-  const [formData, setFormData] = useState({ originalUrl: "", customUrl: "" });
+  const [formData, setFormData] = useState({ long_url: "", own_url: "" , short_url: "" , created_at: 0 });
   const [message, setMessage] = useState("");
+
+  const addUrl = async () => {
+    try {
+      const response = await fetch('http://localhost:6969/add', {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        window.alert("URL Added Successfully");
+      } else {
+        const errorData = await response.json();
+        window.alert(`Failed to Add URL: ${errorData.message}`);
+      }
+    } catch (error) {
+      window.alert(`Failed to Add URL: ${error.message}`);
+    }
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const timestamp = Date.now(); 
+    if (option === "random") {
+      setFormData((prev) => ({
+        ...prev,
+        short_url: Math.floor(10000 + Math.random() * 90000),
+        created_at: timestamp,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        created_at: timestamp,
+      }));
+    }
+    addUrl();
     console.log(formData);
-
-    
-    setTimeout(() => {
-      setMessage("Your short URL has been successfully created!");
-    }, 1000);
   };
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -57,8 +88,8 @@ const UrlShortener = () => {
           {option === "random" && (
             <input
               type="text"
-              name="originalUrl"
-              value={formData.originalUrl}
+              name="long_url"
+              value={formData.long_url}
               onChange={handleChange}
               placeholder="Enter Your URL"
               className="w-full px-3 py-2 text-black rounded-lg mb-2"
@@ -69,8 +100,8 @@ const UrlShortener = () => {
             <div>
               <input
                 type="text"
-                name="originalUrl"
-                value={formData.originalUrl}
+                name="long_url"
+                value={formData.long_url}
                 onChange={handleChange}
                 placeholder="Enter Original URL"
                 className="w-full px-3 py-2 text-black rounded-lg mb-2"
@@ -78,8 +109,8 @@ const UrlShortener = () => {
               />
               <input
                 type="text"
-                name="customUrl"
-                value={formData.customUrl}
+                name="own_url"
+                value={formData.own_url}
                 onChange={handleChange}
                 placeholder="Enter Custom URL"
                 className="w-full px-3 py-2 text-black rounded-lg"
