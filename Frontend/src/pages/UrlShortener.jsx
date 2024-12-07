@@ -4,19 +4,47 @@ const UrlShortener = () => {
   const [option, setOption] = useState("random");
   const [formData, setFormData] = useState({ long_url: "", own_url: "" , short_url: "" , created_at: 0 });
   const [message, setMessage] = useState("");
+  const [sURL,setSurl] = useState("")
 
-  const addUrl = async () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+  
+    const timestamp = Date.now();
+    let updatedFormData;
+  
+    if (option === "random") {
+      updatedFormData = {
+        ...formData,
+        short_url: Math.floor(10000 + Math.random() * 90000),
+        created_at: timestamp,
+      };
+    } else {
+      updatedFormData = {
+        ...formData,
+        short_url: formData.own_url,
+        created_at: timestamp,
+      };
+    }
+  
+    setFormData(updatedFormData); 
+    addUrl(updatedFormData); 
+    setSurl(updatedFormData.short_url)
+  };
+  
+  const addUrl = async (data) => {
     try {
       const response = await fetch('http://localhost:6969/add', {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(data),
       });
-
+  
       if (response.ok) {
         window.alert("URL Added Successfully");
+        setMessage("URL Added Successfully!")
+        
       } else {
         const errorData = await response.json();
         window.alert(`Failed to Add URL: ${errorData.message}`);
@@ -24,25 +52,6 @@ const UrlShortener = () => {
     } catch (error) {
       window.alert(`Failed to Add URL: ${error.message}`);
     }
-  }
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const timestamp = Date.now(); 
-    if (option === "random") {
-      setFormData((prev) => ({
-        ...prev,
-        short_url: Math.floor(10000 + Math.random() * 90000),
-        created_at: timestamp,
-      }));
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        created_at: timestamp,
-      }));
-    }
-    addUrl();
-    console.log(formData);
   };
   
 
@@ -128,7 +137,7 @@ const UrlShortener = () => {
         {message && (
           <div className="mt-4 p-4 bg-green-700 text-center rounded-lg">
             {message}
-            <h1>Your URL is: </h1> 
+            <h1>Your URL is: <a>http://localhost:6969/get/{sURL}</a> </h1> 
           </div>
         )}
 

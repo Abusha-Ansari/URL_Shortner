@@ -10,10 +10,10 @@ require('dotenv').config();
 app.use(bodyParser.json());
 
 const corsOptions = {
-    origin: process.env.FRONTEND_ORIGIN, // Allow the frontend origin
+    origin: process.env.FRONTEND_ORIGIN, 
     methods: "GET, PUT, PATCH, DELETE, POST, HEAD",
-    credentials: true, // Allow cookies and credentials
-    allowedHeaders: ["Content-Type", "Authorization"], // Add necessary headers
+    credentials: true, 
+    allowedHeaders: ["Content-Type", "Authorization"], 
   };
 app.use(cors(corsOptions))
 
